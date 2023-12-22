@@ -5,8 +5,12 @@ import com.seyrek.flightsearchapi.entities.Flight;
 import com.seyrek.flightsearchapi.repositories.FlightRepository;
 import com.seyrek.flightsearchapi.requests.FlightRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -64,6 +68,15 @@ public class FlightService {
 
     public void deleteFlightById(Long id) {
         flightRepository.deleteById(id);
+    }
+
+
+    @Scheduled(cron = "0 0 8 * * *")
+    public void getFlightFromMockApi() {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://65858ed7022766bcb8c8e25e.mockapi.io/api/flight/add";
+        FlightRequest[] f = restTemplate.getForObject(url, FlightRequest[].class);
+        createFlight(f[0]);
     }
 
 }
